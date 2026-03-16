@@ -9,3 +9,4 @@ python-multipart
 httpx
 pytest
 pydantic[email]
+python-jose[cryptography]
