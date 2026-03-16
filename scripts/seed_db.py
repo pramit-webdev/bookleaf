@@ -30,13 +30,20 @@ async def seed_data():
             })
             user_id = res.user.id
         except Exception as e:
-            print(f"Error creating auth user {email}: {e}")
-            # If user already exists, get their ID
+            print(f"Auth user {email} might already exist or error: {e}")
+            # Try to get ID from authors table first
             user_res = supabase_admin.table("authors").select("id").eq("email", email).execute()
             if user_res.data:
                 user_id = user_res.data[0]["id"]
             else:
-                continue
+                # If not in authors table, search in Supabase Auth list
+                all_users = supabase_admin.auth.admin.list_users()
+                found_user = next((u for u in all_users if u.email == email), None)
+                if found_user:
+                    user_id = found_user.id
+                else:
+                    print(f"❌ Failed to find or create user {email}. Skipping.")
+                    continue
 
         # 2. Insert into public.authors
         author_record = {
@@ -72,7 +79,7 @@ async def seed_data():
                 "print_partner": book_data["print_partner"],
                 "available_on": book_data["available_on"]
             }
-            supabase_admin.table("books").upsert(book_record).execute()
+            supabase_admin.table("books").upsert(book_record, on_conflict="book_id").execute()
             print(f"Seeded book: {book_data['title']}")
 
 if __name__ == "__main__":
