@@ -32,6 +32,8 @@ async def create_ticket(ticket_in: TicketCreate, current_user: dict = Depends(ge
         
         res = supabase.table("tickets").insert(ticket_data).execute()
         return res.data[0]
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -50,6 +52,8 @@ async def get_tickets(status: Optional[str] = None, category: Optional[str] = No
             
         res = query.order("created_at", desc=True).execute()
         return res.data
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -65,6 +69,8 @@ async def get_ticket(ticket_id: str, current_user: dict = Depends(get_current_us
             raise HTTPException(status_code=403, detail="Permission denied")
             
         return ticket
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -78,6 +84,8 @@ async def update_ticket(ticket_id: str, ticket_in: TicketUpdate, current_user: d
         if not res.data:
             raise HTTPException(status_code=404, detail="Ticket not found")
         return res.data[0]
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -102,6 +110,8 @@ async def add_response(ticket_id: str, response_in: TicketResponseCreate, curren
         
         res = supabase.table("ticket_responses").insert(response_data).execute()
         return res.data[0]
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -115,5 +125,7 @@ async def get_draft(ticket_id: str, current_user: dict = Depends(require_admin))
         ticket = ticket_res.data[0]
         draft = generate_draft_response(ticket["subject"], ticket["description"])
         return {"draft": draft}
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

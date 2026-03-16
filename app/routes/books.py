@@ -19,6 +19,8 @@ async def get_books(current_user: dict = Depends(get_current_user)):
             
         res = query.execute()
         return res.data
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

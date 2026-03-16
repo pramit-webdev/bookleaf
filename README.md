@@ -46,10 +46,12 @@ python -m scripts.seed_db
 uvicorn app.main:app --reload
 ```
 
-### 4. Deployment
-- Push the repository to GitHub.
-- Connect the repository to [Render](https://render.com).
-- The `render.yaml` file will automatically configure the service. Add the environment variables in the Render dashboard.
+### 5. API Testing (Postman)
+A Postman collection is provided in `bookleaf_postman_collection.json`.
+- Import the JSON file into Postman.
+- The `base_url` variable is set to your Render URL by default.
+- Running the **Login** request will automatically save the `access_token` for subsequent requests in the collection.
+- For requests requiring a `ticket_id`, copy a UUID from a created ticket and update the collection variable.
 
 ---
 
