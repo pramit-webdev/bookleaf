@@ -9,21 +9,23 @@ from datetime import datetime
 router = APIRouter()
 
 @router.post("/", response_model=Ticket)
-async def create_ticket(ticket_in: TicketCreate, current_user: dict = Depends(get_current_user)):
+async def create_ticket(ticket: TicketCreate, current_user: dict = Depends(get_current_user)):
     try:
-        # Verify author_id matches if not admin
-        if current_user["role"] != "admin" and ticket_in.author_id != current_user["author_id"]:
-            raise HTTPException(status_code=403, detail="Cannot create ticket for another author")
+        # Security: Auto-assign author_id for non-admins
+        if current_user["role"] != "admin":
+            ticket.author_id = current_user["author_id"]
+        elif not ticket.author_id:
+            raise HTTPException(status_code=400, detail="Admin must provide an author_id")
         
         # AI Processing
-        category = classify_ticket(ticket_in.subject, ticket_in.description)
-        priority_info = assign_priority(ticket_in.subject, ticket_in.description)
+        category = classify_ticket(ticket.subject, ticket.description)
+        priority_info = assign_priority(ticket.subject, ticket.description)
         
         ticket_data = {
-            "author_id": ticket_in.author_id,
-            "book_id": ticket_in.book_id,
-            "subject": ticket_in.subject,
-            "description": ticket_in.description,
+            "author_id": ticket.author_id,
+            "book_id": ticket.book_id,
+            "subject": ticket.subject,
+            "description": ticket.description,
             "category": category,
             "priority": priority_info["priority"],
             "priority_score": priority_info["score"],
@@ -51,7 +53,15 @@ async def get_tickets(status: Optional[str] = None, category: Optional[str] = No
             query = query.eq("category", category)
             
         res = query.order("created_at", desc=True).execute()
-        return res.data
+        tickets = res.data
+        
+        # Filter internal responses for non-admins
+        if current_user["role"] != "admin":
+            for ticket in tickets:
+                if "responses" in ticket:
+                    ticket["responses"] = [r for r in ticket["responses"] if not r["is_internal"]]
+        
+        return tickets
     except HTTPException:
         raise
     except Exception as e:
@@ -67,6 +77,10 @@ async def get_ticket(ticket_id: str, current_user: dict = Depends(get_current_us
         ticket = res.data[0]
         if current_user["role"] != "admin" and ticket["author_id"] != current_user["author_id"]:
             raise HTTPException(status_code=403, detail="Permission denied")
+            
+        # Filter internal responses for non-admins
+        if current_user["role"] != "admin" and "responses" in ticket:
+            ticket["responses"] = [r for r in ticket["responses"] if not r["is_internal"]]
             
         return ticket
     except HTTPException:

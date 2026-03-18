@@ -70,7 +70,7 @@ class TicketBase(BaseModel):
     book_id: Optional[str] = None
 
 class TicketCreate(TicketBase):
-    author_id: str
+    author_id: Optional[str] = None
 
 class TicketUpdate(BaseModel):
     category: Optional[str] = None

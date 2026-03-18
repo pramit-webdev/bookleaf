@@ -30,13 +30,14 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"email\": \"priya.sharma@email.com\",\n    \"password\": \"password123\"\n}",
+							"raw": "{\n    \"email\": \"admin@bookleaf.com\",\n    \"password\": \"password123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
 								}
 							}
 						},
+						"description": "Use admin@bookleaf.com / password123 for Admin flows, or any author email (e.g. rohit.kapoor@email.com) for Author flows.",
 						"url": {
 							"raw": "{{base_url}}/auth/login",
 							"host": [
@@ -102,7 +103,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"author_id\": \"AUTH001\",\n    \"book_id\": \"BK001\",\n    \"subject\": \"Missing royalty payment\",\n    \"description\": \"I published my book 4 months ago and still haven’t received any royalty. What’s going on?\"\n}",
+							"raw": "{\n    \"book_id\": \"BK001\",\n    \"subject\": \"ISBN missing for my book\",\n    \"description\": \"I see my book 'Code & Karma' is live on Amazon, but the ISBN is blank in this portal. Can you please update it?\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
