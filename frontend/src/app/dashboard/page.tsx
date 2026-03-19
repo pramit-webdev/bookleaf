@@ -1,10 +1,10 @@
 'use client';
 
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import { useAuth } from '@/context/AuthContext';
+import DashboardLayout from '../../components/layout/DashboardLayout';
+import { useAuth } from '../../context/AuthContext';
 import { Book, Ticket, Clock, CheckCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { fetchWithAuth } from '@/lib/api';
+import { fetchWithAuth } from '../../lib/api';
 
 export default function AuthorDashboard() {
   const { user } = useAuth();

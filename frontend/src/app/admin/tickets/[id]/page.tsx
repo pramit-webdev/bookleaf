@@ -1,9 +1,9 @@
 'use client';
 
-import DashboardLayout from '@/components/layout/DashboardLayout';
-import { useAuth } from '@/context/AuthContext';
+import DashboardLayout from '../../../../components/layout/DashboardLayout';
+import { useAuth } from '../../../../context/AuthContext';
 import { useEffect, useState, use } from 'react';
-import { fetchWithAuth } from '@/lib/api';
+import { fetchWithAuth } from '../../../../lib/api';
 import { toast } from 'sonner';
 import { 
   ArrowLeft, 

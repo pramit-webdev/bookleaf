@@ -1,8 +1,8 @@
 'use client';
 
-import DashboardLayout from '@/components/layout/DashboardLayout';
+import DashboardLayout from '../../../components/layout/DashboardLayout';
 import { useEffect, useState } from 'react';
-import { fetchWithAuth } from '@/lib/api';
+import { fetchWithAuth } from '../../../lib/api';
 import Link from 'next/link';
 import { 
   Filter, 

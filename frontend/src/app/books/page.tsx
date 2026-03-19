@@ -1,8 +1,8 @@
 'use client';
 
-import DashboardLayout from '@/components/layout/DashboardLayout';
+import DashboardLayout from '../../components/layout/DashboardLayout';
 import { useEffect, useState } from 'react';
-import { fetchWithAuth } from '@/lib/api';
+import { fetchWithAuth } from '../../lib/api';
 import { Book as BookIcon, ExternalLink, IndianRupee } from 'lucide-react';
 
 export default function MyBooks() {

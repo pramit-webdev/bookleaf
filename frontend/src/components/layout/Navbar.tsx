@@ -1,6 +1,6 @@
 'use client';
 
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { User, Bell, Search } from 'lucide-react';
 
 export default function Navbar() {
