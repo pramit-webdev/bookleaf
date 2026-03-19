@@ -60,24 +60,24 @@ export default function MyBooks() {
                   </div>
                   <div className="stat">
                     <span>MRP</span>
-                    <strong>₹{book.mrp}</strong>
+                    <strong>{book.mrp ? `₹${book.mrp}` : '-'}</strong>
                   </div>
                   <div className="stat">
                     <span>Royalty Earned</span>
                     <strong className="royalty-value">
-                      ₹{book.total_royalty_earned.toLocaleString()}
+                      {book.total_royalty_earned ? `₹${book.total_royalty_earned.toLocaleString()}` : '-'}
                     </strong>
                   </div>
                   <div className="stat">
                     <span>Royalty Paid</span>
                     <strong className="paid">
-                      ₹{book.royalty_paid.toLocaleString()}
+                      {book.royalty_paid ? `₹${book.royalty_paid.toLocaleString()}` : '-'}
                     </strong>
                   </div>
                   <div className="stat">
                     <span>Royalty Pending</span>
                     <strong className="pending">
-                      ₹{book.royalty_pending.toLocaleString()}
+                      {book.royalty_pending ? `₹${book.royalty_pending.toLocaleString()}` : '-'}
                     </strong>
                   </div>
                 </div>
@@ -86,7 +86,7 @@ export default function MyBooks() {
                   <div className="metadata">
                     <span>{book.genre}</span>
                     <span className="dot">•</span>
-                    <span>{book.publication_date ? new Date(book.publication_date).toLocaleDateString() : 'In Production'}</span>
+                    <span>{book.publication_date ? new Date(book.publication_date).toLocaleDateString() : 'Pending Release'}</span>
                   </div>
                   <button className="details-btn">
                     <ExternalLink size={16} />
@@ -110,30 +110,37 @@ export default function MyBooks() {
           align-items: flex-end;
         }
         .page-header h1 {
-          font-size: 1.875rem;
-          font-weight: 700;
+          font-size: 2.25rem;
+          font-weight: 800;
+          letter-spacing: -0.025em;
+          background: linear-gradient(135deg, var(--text-main) 0%, var(--primary) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
         }
         .page-header p {
           color: var(--text-muted);
+          font-size: 1.125rem;
         }
         .books-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-          gap: 1.5rem;
+          grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+          gap: 2rem;
         }
         .book-card {
           background-color: var(--bg-card);
           border: 1px solid var(--border);
           border-radius: var(--radius);
-          padding: 1.5rem;
+          padding: 2rem;
           display: flex;
           flex-direction: column;
-          gap: 1.25rem;
-          transition: transform 0.2s, box-shadow 0.2s;
+          gap: 1.5rem;
+          transition: var(--transition);
+          box-shadow: var(--shadow-sm);
         }
         .book-card:hover {
-          transform: translateY(-4px);
-          box-shadow: var(--shadow-md);
+          transform: translateY(-8px);
+          box-shadow: var(--shadow-lg);
+          border-color: var(--primary);
         }
         .book-header {
           display: flex;
@@ -141,58 +148,68 @@ export default function MyBooks() {
           align-items: center;
         }
         .book-icon {
-          width: 40px;
-          height: 40px;
-          background-color: #eff6ff;
-          border-radius: 10px;
+          width: 48px;
+          height: 48px;
+          background-color: var(--primary-soft);
+          border-radius: 12px;
           display: flex;
           align-items: center;
           justify-content: center;
         }
         .status-badge {
-          font-size: 0.75rem;
-          font-weight: 700;
-          padding: 0.25rem 0.75rem;
+          font-size: 0.7rem;
+          font-weight: 800;
+          padding: 0.35rem 0.85rem;
           border-radius: 999px;
           text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
-        .status-badge[data-status="Published"] { background-color: #f0fdf4; color: #16a34a; }
-        .status-badge[data-status="In Production"] { background-color: #fff7ed; color: #ea580c; }
+        .status-badge[data-status^="Published"] { background-color: #f0fdf4; color: #16a34a; }
+        .status-badge[data-status^="In Production"] { background-color: #fff7ed; color: #ea580c; border: 1px solid #ffedd5; }
         
         .book-info h3 {
-          font-size: 1.125rem;
-          font-weight: 700;
-          margin-bottom: 0.25rem;
+          font-size: 1.25rem;
+          font-weight: 800;
+          margin-bottom: 0.4rem;
           color: var(--text-main);
+          line-height: 1.2;
         }
         .isbn {
           font-size: 0.875rem;
           color: var(--text-muted);
+          font-family: monospace;
+          background: var(--bg-main);
+          padding: 0.2rem 0.5rem;
+          border-radius: 4px;
+          width: fit-content;
         }
         .royalty-stats {
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 0.75rem;
-          padding: 1rem;
+          gap: 1rem;
+          padding: 1.25rem;
           background-color: var(--bg-main);
-          border-radius: 0.75rem;
+          border-radius: 1rem;
+          border: 1px solid var(--border);
         }
         .stat {
           display: flex;
           flex-direction: column;
-          gap: 0.25rem;
+          gap: 0.35rem;
         }
         .stat span {
-          font-size: 0.7rem;
+          font-size: 0.65rem;
           color: var(--text-muted);
-          font-weight: 500;
+          font-weight: 700;
           text-transform: uppercase;
+          letter-spacing: 0.05em;
         }
         .stat strong {
-          font-size: 0.95rem;
+          font-size: 1.125rem;
           display: flex;
           align-items: center;
           gap: 0.25rem;
+          font-weight: 700;
         }
         .royalty-value { color: var(--primary); }
         .paid { color: #16a34a; }
@@ -202,6 +219,8 @@ export default function MyBooks() {
           justify-content: space-between;
           align-items: center;
           margin-top: auto;
+          padding-top: 1rem;
+          border-top: 1px solid var(--border);
         }
         .metadata {
           font-size: 0.75rem;

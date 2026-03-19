@@ -97,6 +97,10 @@ async def update_ticket(ticket_id: str, ticket_in: TicketUpdate, current_user: d
         update_data = ticket_in.dict(exclude_unset=True)
         update_data["updated_at"] = datetime.utcnow().isoformat()
         
+        # Convert UUIDs to strings for Supabase if necessary
+        if "assignee_id" in update_data and update_data["assignee_id"]:
+            update_data["assignee_id"] = str(update_data["assignee_id"])
+            
         res = supabase.table("tickets").update(update_data).eq("id", ticket_id).execute()
         if not res.data:
             raise HTTPException(status_code=404, detail="Ticket not found")

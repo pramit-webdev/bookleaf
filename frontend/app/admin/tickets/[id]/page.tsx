@@ -26,6 +26,7 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
   
   const [ticket, setTicket] = useState<any>(null);
   const [responses, setResponses] = useState<any[]>([]);
+  const [isInternal, setIsInternal] = useState(false);
   const [newResponse, setNewResponse] = useState('');
   const [aiDraft, setAiDraft] = useState('');
   const [isEditingDraft, setIsEditingDraft] = useState(false);
@@ -37,6 +38,7 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
   const [status, setStatus] = useState('');
   const [priority, setPriority] = useState('');
   const [category, setCategory] = useState('');
+  const [assigneeId, setAssigneeId] = useState<string | null>(null);
 
   const loadTicket = async () => {
     try {
@@ -46,6 +48,7 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
       setStatus(data.status);
       setPriority(data.priority);
       setCategory(data.category);
+      setAssigneeId(data.assignee_id);
     } catch (err) {
       toast.error('Could not find ticket.');
     } finally {
@@ -60,6 +63,7 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
       setAiDraft(data.draft);
       setIsEditingDraft(true);
       setNewResponse(data.draft);
+      setIsInternal(false);
     } catch (err) {
       toast.error('Failed to generate AI draft.');
     } finally {
@@ -69,6 +73,9 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
 
   useEffect(() => {
     loadTicket();
+    // Real-time polling
+    const interval = setInterval(loadTicket, 5000);
+    return () => clearInterval(interval);
   }, [id]);
 
   const handleUpdateTicket = async () => {
@@ -76,12 +83,28 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
     try {
       await fetchWithAuth(`/tickets/${id}`, {
         method: 'PATCH',
-        body: JSON.stringify({ status, priority, category }),
+        body: JSON.stringify({ status, priority, category, assignee_id: assigneeId }),
       });
       toast.success('Ticket updated successfully.');
       loadTicket();
     } catch (err) {
       toast.error('Failed to update ticket.');
+    } finally {
+      setUpdating(false);
+    }
+  };
+
+  const handleAssignToMe = async () => {
+    setUpdating(true);
+    try {
+      await fetchWithAuth(`/tickets/${id}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ assignee_id: user?.id }),
+      });
+      toast.success('Ticket assigned to you.');
+      loadTicket();
+    } catch (err) {
+      toast.error('Failed to assign ticket.');
     } finally {
       setUpdating(false);
     }
@@ -95,12 +118,16 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
     try {
       await fetchWithAuth(`/tickets/${id}/responses`, {
         method: 'POST',
-        body: JSON.stringify({ content: newResponse }),
+        body: JSON.stringify({ 
+          content: newResponse,
+          is_internal: isInternal 
+        }),
       });
       setNewResponse('');
       setIsEditingDraft(false);
+      setIsInternal(false);
       loadTicket();
-      toast.success('Response sent to author!');
+      toast.success(isInternal ? 'Internal note added!' : 'Response sent to author!');
     } catch (err: any) {
       toast.error(err.message || 'Failed to send response');
     } finally {
@@ -154,11 +181,24 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
 
             <div className="response-area card">
               <div className="card-header">
-                <h3>Draft Response</h3>
+                <div className="tab-group">
+                  <button 
+                    className={`tab ${!isInternal ? 'active' : ''}`} 
+                    onClick={() => setIsInternal(false)}
+                  >
+                    Public Response
+                  </button>
+                  <button 
+                    className={`tab ${isInternal ? 'active internal' : ''}`} 
+                    onClick={() => setIsInternal(true)}
+                  >
+                    Internal Note
+                  </button>
+                </div>
                 <button 
                   onClick={fetchAIDraft} 
                   className="ai-btn" 
-                  disabled={draftLoading}
+                  disabled={draftLoading || isInternal}
                 >
                   <Sparkles size={16} />
                   {draftLoading ? 'Generating...' : 'Get AI Draft'}
@@ -167,16 +207,21 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
               
               <form onSubmit={handleSendResponse} className="response-form">
                 <textarea
-                  placeholder="Draft your response here..."
+                  placeholder={isInternal ? "Add a private note for the operations team..." : "Draft your response to the author..."}
+                  className={isInternal ? 'internal-textarea' : ''}
                   value={newResponse}
                   onChange={(e) => setNewResponse(e.target.value)}
                   rows={8}
                 />
                 <div className="form-actions">
-                   <p className="hint">Responses are visible to authors.</p>
-                   <button type="submit" className="send-btn" disabled={updating}>
-                     <Send size={18} />
-                     <span>Send Response</span>
+                   <p className="hint">
+                     {isInternal 
+                       ? "🔒 Internal notes are only visible to the operations team." 
+                       : "👋 Public responses are visible to the author."}
+                   </p>
+                   <button type="submit" className={`send-btn ${isInternal ? 'internal-btn' : ''}`} disabled={updating}>
+                     {isInternal ? <Lock size={18} /> : <Send size={18} />}
+                     <span>{isInternal ? 'Add Internal Note' : 'Send Response'}</span>
                    </button>
                 </div>
               </form>
@@ -185,7 +230,18 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
 
           <aside className="sidebar-panel">
             <div className="management-card card">
-               <h3>Ticket Management</h3>
+               <div className="mgmt-header">
+                 <h3>Ticket Management</h3>
+                 {!assigneeId ? (
+                   <button className="assign-btn" onClick={handleAssignToMe} disabled={updating}>
+                     Assign to Me
+                   </button>
+                 ) : assigneeId === user?.id ? (
+                   <span className="assigned-badge">Assigned to You</span>
+                 ) : (
+                   <span className="assigned-badge other">Assigned to Other</span>
+                 )}
+               </div>
                
                <div className="mgmt-group">
                  <label>Status</label>
@@ -199,7 +255,7 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
 
                <div className="mgmt-group">
                  <label>Priority (AI Sug: {ticket.priority})</label>
-                 <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+                 <select value={priority} onChange={(e) => setPriority(e.target.value)} className={priority.toLowerCase()}>
                    <option value="Low">Low</option>
                    <option value="Medium">Medium</option>
                    <option value="High">High</option>
@@ -264,19 +320,39 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
         .msg-header { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.5rem; color: var(--text-muted); }
         .msg.internal { background: #fffbeb; border-color: #fbbf24; }
 
-        .ai-btn { background: #eff6ff; color: #2563eb; padding: 0.5rem 1rem; border-radius: 999px; font-weight: 600; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
-        .ai-btn:hover { background: #dbeafe; }
+        .ai-btn { background: var(--primary-soft); color: var(--primary); padding: 0.5rem 1rem; border-radius: 999px; font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
+        .ai-btn:hover:not(:disabled) { background: #e0e7ff; }
 
-        .response-form textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 0.5rem; padding: 1rem; background: var(--bg-main); outline: none; margin-bottom: 1rem; }
+        .tab-group { display: flex; gap: 0.5rem; }
+        .tab { padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); }
+        .tab.active { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border); }
+        .tab.active.internal { background: #fffbeb; color: #92400e; border-color: #fde68a; }
+
+        .response-form textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 0.5rem; padding: 1rem; background: var(--bg-main); outline: none; margin-bottom: 1rem; transition: var(--transition); }
+        .response-form textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+        .response-form textarea.internal-textarea { background: #fffdf5; border-color: #fde68a; }
+        .response-form textarea.internal-textarea:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px #fef3c7; }
+
         .form-actions { display: flex; justify-content: space-between; align-items: center; }
         .hint { font-size: 0.75rem; color: var(--text-muted); }
-        .send-btn { background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; }
+        .send-btn { background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; box-shadow: var(--shadow-sm); }
+        .send-btn.internal-btn { background: #f59e0b; }
+        .send-btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); opacity: 0.9; }
+
+        .mgmt-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+        .assign-btn { font-size: 0.75rem; font-weight: 700; color: var(--primary); background: var(--primary-soft); padding: 0.35rem 0.75rem; border-radius: 6px; }
+        .assigned-badge { font-size: 0.75rem; font-weight: 700; color: #16a34a; background: #f0fdf4; padding: 0.35rem 0.75rem; border-radius: 6px; }
+        .assigned-badge.other { color: var(--text-muted); background: var(--bg-main); }
 
         .mgmt-group { margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
-        .mgmt-group label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
-        select { width: 100%; padding: 0.6rem; border-radius: 0.5rem; border: 1px solid var(--border); background: var(--bg-main); }
-        .update-btn { width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1px solid var(--primary); color: var(--primary); font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
-        .update-btn:hover { background: #eff6ff; }
+        .mgmt-group label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.025em; }
+        select { width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1.5px solid var(--border); background: var(--bg-main); font-weight: 600; outline: none; transition: var(--transition); }
+        select:focus { border-color: var(--primary); }
+        select.critical { color: #ef4444; border-color: #fecaca; }
+        select.high { color: #ea580c; border-color: #fed7aa; }
+
+        .update-btn { width: 100%; padding: 0.85rem; border-radius: 0.5rem; border: 1.5px solid var(--primary); color: var(--primary); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: var(--transition); }
+        .update-btn:hover { background: var(--primary-soft); }
         
         .book-context { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border); }
         .loading { text-align: center; padding: 4rem; color: var(--text-muted); }

@@ -77,6 +77,7 @@ class TicketUpdate(BaseModel):
     priority: Optional[str] = None
     priority_score: Optional[int] = None
     status: Optional[str] = None
+    assignee_id: Optional[UUID] = None
 
 class Ticket(TicketBase):
     id: UUID
@@ -85,6 +86,7 @@ class Ticket(TicketBase):
     priority: Optional[str]
     priority_score: Optional[int]
     status: str
+    assignee_id: Optional[UUID] = None
     created_at: datetime
     updated_at: datetime
     responses: List[TicketResponse] = []

@@ -136,79 +136,99 @@ export default function NewTicket() {
           margin: 0 auto;
           display: flex;
           flex-direction: column;
-          gap: 2rem;
+          gap: 2.5rem;
         }
         .page-header h1 {
-          font-size: 1.875rem;
-          font-weight: 700;
-          margin-bottom: 0.5rem;
+          font-size: 2.25rem;
+          font-weight: 800;
+          letter-spacing: -0.025em;
+          background: linear-gradient(135deg, var(--text-main) 0%, var(--primary) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          margin-bottom: 0.75rem;
         }
         .page-header p {
           color: var(--text-muted);
+          font-size: 1.125rem;
         }
         .ticket-form {
           background-color: var(--bg-card);
-          padding: 2.5rem;
+          padding: 3rem;
           border-radius: var(--radius);
           border: 1px solid var(--border);
-          box-shadow: var(--shadow-sm);
+          box-shadow: var(--shadow-lg);
           display: flex;
           flex-direction: column;
-          gap: 1.5rem;
+          gap: 2rem;
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
         }
         .form-group {
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
+          gap: 0.75rem;
         }
         label {
-          font-size: 0.875rem;
-          font-weight: 600;
+          font-size: 0.75rem;
+          font-weight: 800;
           color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
         }
         input, select, textarea {
-          padding: 0.75rem 1rem;
-          border: 1.5px solid var(--border);
-          border-radius: 0.5rem;
+          padding: 1rem 1.25rem;
+          border: 2px solid var(--border);
+          border-radius: 0.75rem;
           background-color: var(--bg-main);
           color: var(--text-main);
           font-size: 1rem;
-          transition: border-color 0.2s;
+          font-weight: 500;
+          transition: var(--transition);
+          outline: none;
         }
         input:focus, select:focus, textarea:focus {
-          outline: none;
           border-color: var(--primary);
+          box-shadow: 0 0 0 4px var(--primary-soft);
+          transform: translateY(-1px);
         }
         .info-box {
-          background-color: #eff6ff;
-          color: #1e40af;
-          padding: 1rem;
-          border-radius: 0.5rem;
+          background-color: var(--primary-soft);
+          color: var(--primary);
+          padding: 1.25rem;
+          border-radius: 1rem;
           display: flex;
-          gap: 0.75rem;
+          gap: 1rem;
           align-items: center;
-          font-size: 0.875rem;
+          font-size: 0.9rem;
+          font-weight: 600;
+          border: 1px solid #dbeafe;
         }
         .submit-btn {
           background-color: var(--primary);
           color: white;
-          padding: 1rem;
-          border-radius: 0.5rem;
-          font-weight: 600;
+          padding: 1.125rem;
+          border-radius: 0.75rem;
+          font-weight: 800;
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: 0.75rem;
-          transition: background-color 0.2s;
+          gap: 0.85rem;
+          transition: var(--transition);
           margin-top: 1rem;
+          box-shadow: var(--shadow-md);
+          font-size: 1rem;
+          letter-spacing: 0.025em;
         }
         .submit-btn:hover:not(:disabled) {
-          background-color: var(--primary-hover);
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-lg);
+          opacity: 0.9;
         }
         .submit-btn:disabled {
-          opacity: 0.7;
+          opacity: 0.6;
           cursor: not-allowed;
         }
+        .hint { font-size: 0.75rem; color: var(--text-muted); margin-top: -0.25rem; }
       `}</style>
     </DashboardLayout>
   );

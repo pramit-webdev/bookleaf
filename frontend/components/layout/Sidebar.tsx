@@ -59,7 +59,7 @@ export default function Sidebar() {
 
       <style jsx>{`
         .sidebar {
-          width: 260px;
+          width: 280px;
           height: 100vh;
           background-color: var(--bg-card);
           border-right: 1px solid var(--border);
@@ -67,61 +67,75 @@ export default function Sidebar() {
           flex-direction: column;
           position: sticky;
           top: 0;
+          box-shadow: var(--shadow-sm);
         }
         .sidebar-header {
-          padding: 2rem 1.5rem;
+          padding: 2.5rem 2rem;
           display: flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: 1rem;
         }
         .logo-text {
-          font-size: 1.25rem;
-          font-weight: 800;
+          font-size: 1.5rem;
+          font-weight: 900;
           color: var(--text-main);
-          letter-spacing: -0.025em;
+          letter-spacing: -0.04em;
+          background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
         }
         .menu-list {
           flex: 1;
-          padding: 0 1rem;
+          padding: 0 1.25rem;
           display: flex;
           flex-direction: column;
-          gap: 0.25rem;
+          gap: 0.5rem;
         }
         .menu-item {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
-          padding: 0.75rem 1rem;
-          border-radius: 0.5rem;
+          gap: 1rem;
+          padding: 0.85rem 1.25rem;
+          border-radius: 0.75rem;
           color: var(--text-muted);
-          font-weight: 500;
-          transition: all 0.2s;
+          font-weight: 600;
+          font-size: 0.95rem;
+          transition: var(--transition);
         }
         .menu-item:hover {
           background-color: var(--bg-main);
           color: var(--primary);
+          transform: translateX(4px);
         }
         .menu-item.active {
-          background-color: var(--bg-main);
+          background-color: var(--primary-soft);
+          color: var(--primary);
+          box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.1);
+        }
+        .menu-item.active :global(svg) {
+          transform: scale(1.1);
           color: var(--primary);
         }
         .sidebar-footer {
-          padding: 1.5rem;
+          padding: 2rem;
           border-top: 1px solid var(--border);
         }
         .logout-btn {
           display: flex;
           align-items: center;
-          gap: 0.75rem;
-          padding: 0.75rem 1rem;
+          gap: 1rem;
+          padding: 0.85rem 1.25rem;
           width: 100%;
-          border-radius: 0.5rem;
+          border-radius: 0.75rem;
           color: #ef4444;
-          font-weight: 600;
-          transition: background-color 0.2s;
+          font-weight: 700;
+          font-size: 0.95rem;
+          transition: var(--transition);
         }
         .logout-btn:hover {
           background-color: #fef2f2;
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-sm);
         }
       `}</style>
     </aside>
