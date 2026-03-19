@@ -33,6 +33,9 @@ async def create_ticket(ticket: TicketCreate, current_user: dict = Depends(get_c
         }
         
         res = supabase.table("tickets").insert(ticket_data).execute()
+        ticket_id = res.data[0]["id"]
+        # Fetch with joins
+        res = supabase.table("tickets").select("*, book:books!book_id(*), author:authors!author_id(*), responses:ticket_responses(*)").eq("id", ticket_id).execute()
         return res.data[0]
     except HTTPException:
         raise
@@ -42,7 +45,7 @@ async def create_ticket(ticket: TicketCreate, current_user: dict = Depends(get_c
 @router.get("/", response_model=List[Ticket])
 async def get_tickets(status: Optional[str] = None, category: Optional[str] = None, current_user: dict = Depends(get_current_user)):
     try:
-        query = supabase.table("tickets").select("*, responses:ticket_responses(*)")
+        query = supabase.table("tickets").select("*, book:books!book_id(*), author:authors!author_id(*), responses:ticket_responses(*)")
         
         if current_user["role"] != "admin":
             query = query.eq("author_id", current_user["author_id"])
@@ -70,7 +73,7 @@ async def get_tickets(status: Optional[str] = None, category: Optional[str] = No
 @router.get("/{ticket_id}", response_model=Ticket)
 async def get_ticket(ticket_id: str, current_user: dict = Depends(get_current_user)):
     try:
-        res = supabase.table("tickets").select("*, responses:ticket_responses(*)").eq("id", ticket_id).execute()
+        res = supabase.table("tickets").select("*, book:books!book_id(*), author:authors!author_id(*), responses:ticket_responses(*)").eq("id", ticket_id).execute()
         if not res.data:
             raise HTTPException(status_code=404, detail="Ticket not found")
             

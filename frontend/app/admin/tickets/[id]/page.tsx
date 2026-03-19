@@ -121,7 +121,7 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
           </Link>
           <div className="header-actions">
              <h1>{ticket.subject}</h1>
-             <p className="author-info">Author: <strong>{ticket.author?.email}</strong> • Ref: #{ticket.id.slice(0, 8)}</p>
+             <p className="author-info">Author: <strong>{ticket.author?.email || ticket.author_id}</strong> • Ref: #{ticket.id.slice(0, 8)}</p>
           </div>
         </header>
 

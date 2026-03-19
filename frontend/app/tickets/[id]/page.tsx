@@ -158,10 +158,10 @@ export default function TicketDetail({ params }: { params: Promise<{ id: string 
                 <Shield size={16} />
                 <span>Priority: {ticket.priority}</span>
               </div>
-              {ticket.book_id && (
+              {ticket.book && (
                 <div className="info-row">
                   <Tag size={16} />
-                  <span>Topic: Book Related</span>
+                  <span>Relates to: {ticket.book.title}</span>
                 </div>
               )}
             </div>

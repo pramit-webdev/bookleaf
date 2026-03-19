@@ -73,7 +73,7 @@ export default function NewTicket() {
             >
               <option value="">General / Account Level</option>
               {books.map((book: any) => (
-                <option key={book.id} value={book.id}>
+                <option key={book.id} value={book.book_id}>
                   {book.title}
                 </option>
               ))}

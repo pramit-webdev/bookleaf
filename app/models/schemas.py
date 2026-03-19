@@ -88,6 +88,8 @@ class Ticket(TicketBase):
     created_at: datetime
     updated_at: datetime
     responses: List[TicketResponse] = []
+    book: Optional[Book] = None
+    author: Optional[Author] = None
 
     class Config:
         from_attributes = True
