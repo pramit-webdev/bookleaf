@@ -78,12 +78,13 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
     return () => clearInterval(interval);
   }, [id]);
 
-  // Auto-generate AI draft on first open if response is empty
+  // Auto-generate AI draft on first open if no public response exists
   useEffect(() => {
-    if (ticket && !newResponse && !responses.some(r => !r.is_internal) && ticket.status === 'Open') {
+    const hasPublicResponse = responses.some(r => !r.is_internal);
+    if (ticket && !newResponse && !hasPublicResponse && ticket.status === 'Open' && !draftLoading) {
       fetchAIDraft();
     }
-  }, [ticket?.id]);
+  }, [ticket?.id, responses.length]);
 
   const handleUpdateTicket = async () => {
     setUpdating(true);
@@ -261,7 +262,10 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
                </div>
 
                <div className="mgmt-group">
-                 <label>Priority (AI Sug: {ticket.priority})</label>
+                 <div className="label-with-badge">
+                   <label>Priority</label>
+                   {priority === ticket.priority && <span className="ai-badge"><Sparkles size={10} /> AI Classified</span>}
+                 </div>
                  <select value={priority} onChange={(e) => setPriority(e.target.value)} className={priority.toLowerCase()}>
                    <option value="Low">Low</option>
                    <option value="Medium">Medium</option>
@@ -271,7 +275,10 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
                </div>
 
                <div className="mgmt-group">
-                 <label>Category (AI Sug: {ticket.category})</label>
+                 <div className="label-with-badge">
+                   <label>Category</label>
+                   {category === ticket.category && <span className="ai-badge"><Sparkles size={10} /> AI Classified</span>}
+                 </div>
                  <select value={category} onChange={(e) => setCategory(e.target.value)}>
                    <option value="Royalty & Payments">Royalty & Payments</option>
                    <option value="ISBN & Metadata Issues">ISBN & Metadata</option>
@@ -352,7 +359,9 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
         .assigned-badge.other { color: var(--text-muted); background: var(--bg-main); }
 
         .mgmt-group { margin-bottom: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; }
-        .mgmt-group label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.025em; }
+        .label-with-badge { display: flex; justify-content: space-between; align-items: center; }
+        .mgmt-group label { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .ai-badge { font-size: 0.65rem; font-weight: 800; color: var(--primary); background: var(--primary-soft); padding: 0.2rem 0.5rem; border-radius: 4px; display: flex; align-items: center; gap: 0.25rem; text-transform: uppercase; }
         select { width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1.5px solid var(--border); background: var(--bg-main); font-weight: 600; outline: none; transition: var(--transition); }
         select:focus { border-color: var(--primary); }
         select.critical { color: #ef4444; border-color: #fecaca; }

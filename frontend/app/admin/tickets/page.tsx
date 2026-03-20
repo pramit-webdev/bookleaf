@@ -324,12 +324,24 @@ export default function AdminTicketQueue() {
           border-bottom: 1px solid var(--border);
           font-size: 0.9rem;
         }
-        .ticket-row { transition: var(--transition); }
+        .ticket-row { 
+          transition: var(--transition); 
+          border-left: 4px solid transparent;
+        }
         .ticket-row:hover {
           background-color: var(--primary-soft);
         }
-        .ticket-row.urgent { background-color: #fffaf0; }
-        .ticket-row.old { background-color: #fff5f5; }
+        .ticket-row.urgent { 
+          background-color: #fffaf0; 
+          border-left-color: #ef4444;
+        }
+        .ticket-row.old { 
+          background-color: #fff1f2; 
+          border-left-color: #f43f5e;
+        }
+        .ticket-row.urgent.old {
+          background: linear-gradient(to right, #fef2f2, #fffaf0);
+        }
         
         .subject-wrapper { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem; }
         .urgent-icon { color: #ef4444; animation: pulse 2s infinite; }
