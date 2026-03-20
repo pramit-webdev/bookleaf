@@ -23,7 +23,6 @@
   --primary-hover: #1e293b;
   --primary-soft: #f1f5f9;
   --accent: #3b82f6;
-  --bg-main: #f8fafc;
 }
 
 .theme-author {
@@ -41,6 +40,13 @@
     --border: rgba(51, 65, 85, 0.8);
     --glass: rgba(15, 23, 42, 0.65);
     --glass-border: rgba(255, 255, 255, 0.05);
+  }
+  
+  .theme-admin {
+    --primary: #f8fafc;
+    --primary-hover: #f1f5f9;
+    --primary-soft: rgba(255, 255, 255, 0.05);
+    --accent: #60a5fa;
   }
 }
 

@@ -377,10 +377,15 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
         .tab.active { background: var(--bg-main); color: var(--text-main); border: 1px solid var(--border); }
         .tab.active.internal { background: #fffbeb; color: #92400e; border-color: #fde68a; }
 
-        .response-form textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 0.5rem; padding: 1rem; background: var(--bg-main); outline: none; margin-bottom: 1rem; transition: var(--transition); }
+        .response-form textarea { width: 100%; border: 1.5px solid var(--border); border-radius: 0.5rem; padding: 1rem; background: var(--bg-main); color: var(--text-main); outline: none; margin-bottom: 1rem; transition: var(--transition); }
         .response-form textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
         .response-form textarea.internal-textarea { background: #fffdf5; border-color: #fde68a; }
         .response-form textarea.internal-textarea:focus { border-color: #f59e0b; box-shadow: 0 0 0 3px #fef3c7; }
+        
+        @media (prefers-color-scheme: dark) {
+          .response-form textarea.internal-textarea { background: #451a03; border-color: #92400e; color: #fef3c7; }
+          .response-form textarea.internal-textarea:focus { border-color: #d97706; box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.2); }
+        }
 
         .form-actions { display: flex; justify-content: space-between; align-items: center; }
         .hint { font-size: 0.75rem; color: var(--text-muted); }
@@ -397,7 +402,7 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
         .label-with-badge { display: flex; justify-content: space-between; align-items: center; }
         .mgmt-group label { font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .ai-badge { font-size: 0.65rem; font-weight: 800; color: var(--primary); background: var(--primary-soft); padding: 0.2rem 0.5rem; border-radius: 4px; display: flex; align-items: center; gap: 0.25rem; text-transform: uppercase; }
-        select { width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1.5px solid var(--border); background: var(--bg-main); font-weight: 600; outline: none; transition: var(--transition); }
+        select { width: 100%; padding: 0.75rem; border-radius: 0.5rem; border: 1.5px solid var(--border); background: var(--bg-main); color: var(--text-main); font-weight: 600; outline: none; transition: var(--transition); }
         select:focus { border-color: var(--primary); }
         select.critical { color: #ef4444; border-color: #fecaca; }
         select.high { color: #ea580c; border-color: #fed7aa; }
