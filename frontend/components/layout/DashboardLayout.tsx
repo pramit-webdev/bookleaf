@@ -51,6 +51,9 @@ export default function DashboardLayout({
           width: 100%;
           min-height: 100vh;
           background-color: var(--bg-main);
+          background-image: 
+            radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.05) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(99, 102, 241, 0.03) 0px, transparent 50%);
         }
         .main-content {
           flex: 1;
@@ -58,10 +61,14 @@ export default function DashboardLayout({
           flex-direction: column;
           max-height: 100vh;
           overflow-y: auto;
+          scroll-behavior: smooth;
         }
         .page-content {
-          padding: 2rem;
-          flex: 1;
+          padding: 3rem;
+          max-width: 1440px;
+          margin: 0 auto;
+          width: 100%;
+          transition: var(--transition);
         }
       `}</style>
     </div>

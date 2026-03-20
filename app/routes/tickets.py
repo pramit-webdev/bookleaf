@@ -47,6 +47,8 @@ async def get_tickets(
     status: Optional[str] = None, 
     category: Optional[str] = None, 
     priority: Optional[str] = None,
+    from_date: Optional[str] = None,
+    to_date: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
 ):
     try:
@@ -61,6 +63,10 @@ async def get_tickets(
             query = query.eq("category", category)
         if priority:
             query = query.eq("priority", priority)
+        if from_date:
+            query = query.gte("created_at", from_date)
+        if to_date:
+            query = query.lte("created_at", to_date)
             
         # Admin sorting: most urgent first, then oldest unresolved first
         if current_user["role"] == "admin":
@@ -159,6 +165,22 @@ async def get_draft(ticket_id: str, current_user: dict = Depends(require_admin))
             raise HTTPException(status_code=404, detail="Ticket not found")
             
         ticket = res.data[0]
+        
+        # Fetch book context for AI grounding
+        book_context = None
+        if ticket.get("book_id"):
+            book_res = supabase.table("books").select("*").eq("book_id", ticket["book_id"]).execute()
+            if book_res.data:
+                book = book_res.data[0]
+                book_context = {
+                    "Title": book.get("title"),
+                    "ISBN": book.get("isbn"),
+                    "Status": book.get("status"),
+                    "Copies Sold": book.get("total_copies_sold"),
+                    "Royalty Pending": f"₹{book.get('royalty_pending', 0)}",
+                    "Total Royalty Earned": f"₹{book.get('total_royalty_earned', 0)}"
+                }
+
         # Format history for the AI service
         history = []
         if "responses" in ticket:
@@ -169,7 +191,12 @@ async def get_draft(ticket_id: str, current_user: dict = Depends(require_admin))
                     "sender_role": "admin" if r["sender_id"] != ticket["author_id"] else "author"
                 })
         
-        draft = generate_draft_response(ticket["subject"], ticket["description"], ticket_history=history)
+        draft = generate_draft_response(
+            ticket["subject"], 
+            ticket["description"], 
+            ticket_history=history,
+            book_context=book_context
+        )
         return {"draft": draft}
     except HTTPException:
         raise

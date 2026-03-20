@@ -1,19 +1,21 @@
 :root {
   --primary: #6366f1;
   --primary-hover: #4f46e5;
-  --primary-soft: #eef2ff;
-  --bg-main: #fbfcfe;
+  --primary-soft: rgba(99, 102, 241, 0.08);
+  --bg-main: #f8fafc;
   --bg-card: #ffffff;
-  --text-main: #1e293b;
+  --text-main: #0f172a;
   --text-muted: #64748b;
-  --border: #e2e8f0;
-  --radius: 1rem;
-  --radius-sm: 0.5rem;
-  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --border: rgba(226, 232, 240, 0.8);
+  --radius: 1.25rem;
+  --radius-sm: 0.75rem;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.08);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --glass: rgba(255, 255, 255, 0.7);
-  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --glass: rgba(255, 255, 255, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.5);
+  --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .theme-admin {
@@ -27,9 +29,8 @@
 .theme-author {
   --primary: #6366f1;
   --primary-hover: #4f46e5;
-  --primary-soft: #eef2ff;
+  --primary-soft: rgba(99, 102, 241, 0.08);
 }
-
 
 @media (prefers-color-scheme: dark) {
   :root {
@@ -37,8 +38,9 @@
     --bg-card: #0f172a;
     --text-main: #f1f5f9;
     --text-muted: #94a3b8;
-    --border: #334155;
-    --glass: rgba(15, 23, 42, 0.7);
+    --border: rgba(51, 65, 85, 0.8);
+    --glass: rgba(15, 23, 42, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.05);
   }
 }
 
@@ -55,6 +57,23 @@ body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
   background-color: var(--bg-main);
   color: var(--text-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glassmorphism Classes */
+.glass-card {
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-xl);
+}
+
+.premium-gradient {
+  background: linear-gradient(135deg, var(--text-main) 0%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 a {
@@ -74,5 +93,10 @@ button, a, input, select, textarea {
 }
 
 button:active {
-  transform: scale(0.98);
+  transform: scale(0.96);
+}
+
+::selection {
+  background: var(--primary-soft);
+  color: var(--primary);
 }

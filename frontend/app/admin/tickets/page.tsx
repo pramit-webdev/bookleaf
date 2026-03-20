@@ -21,7 +21,13 @@ export default function AdminTicketQueue() {
   const { user } = useAuth();
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState({ status: '', priority: '', category: '' });
+  const [filter, setFilter] = useState({ 
+    status: '', 
+    priority: '', 
+    category: '',
+    fromDate: '',
+    toDate: ''
+  });
 
   useEffect(() => {
     const loadTickets = async () => {
@@ -30,6 +36,8 @@ export default function AdminTicketQueue() {
         if (filter.status) params.append('status', filter.status);
         if (filter.category) params.append('category', filter.category);
         if (filter.priority) params.append('priority', filter.priority);
+        if (filter.fromDate) params.append('from_date', filter.fromDate);
+        if (filter.toDate) params.append('to_date', filter.toDate);
         
         const data = await fetchWithAuth(`/tickets/?${params.toString()}`);
         setTickets(data);
@@ -93,28 +101,60 @@ export default function AdminTicketQueue() {
 
         <section className="filters-bar">
           <div className="filter-group">
-            <Filter size={18} />
-            <select value={filter.status} onChange={(e) => setFilter({ ...filter, status: e.target.value })}>
-              <option value="">All Statuses</option>
-              <option value="Open">Open</option>
-              <option value="In Progress">In Progress</option>
-              <option value="Resolved">Resolved</option>
-              <option value="Closed">Closed</option>
-            </select>
-            <select value={filter.priority} onChange={(e) => setFilter({ ...filter, priority: e.target.value })}>
-              <option value="">All Priorities</option>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-              <option value="Critical">Critical</option>
-            </select>
-            <select value={filter.category} onChange={(e) => setFilter({ ...filter, category: e.target.value })}>
-              <option value="">All Categories</option>
-              <option value="Royalty & Payments">Royalty & Payments</option>
-              <option value="ISBN & Metadata Issues">ISBN & Metadata</option>
-              <option value="Printing & Quality">Printing & Quality</option>
-              <option value="General Inquiry">General</option>
-            </select>
+            <div className="select-wrapper">
+              <label>Status</label>
+              <select value={filter.status} onChange={(e) => setFilter({ ...filter, status: e.target.value })}>
+                <option value="">All Statuses</option>
+                <option value="Open">Open</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Closed">Closed</option>
+              </select>
+            </div>
+            <div className="select-wrapper">
+              <label>Priority</label>
+              <select value={filter.priority} onChange={(e) => setFilter({ ...filter, priority: e.target.value })}>
+                <option value="">All Priorities</option>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </div>
+            <div className="select-wrapper">
+              <label>Category</label>
+              <select value={filter.category} onChange={(e) => setFilter({ ...filter, category: e.target.value })}>
+                <option value="">All Categories</option>
+                <option value="Royalty & Payments">Royalty & Payments</option>
+                <option value="ISBN & Metadata Issues">ISBN & Metadata</option>
+                <option value="Printing & Quality">Printing & Quality</option>
+                <option value="General Inquiry">General</option>
+              </select>
+            </div>
+            <div className="select-wrapper">
+              <label>From Date</label>
+              <input 
+                type="date" 
+                value={filter.fromDate} 
+                onChange={(e) => setFilter({ ...filter, fromDate: e.target.value })}
+                className="date-input"
+              />
+            </div>
+            <div className="select-wrapper">
+              <label>To Date</label>
+              <input 
+                type="date" 
+                value={filter.toDate} 
+                onChange={(e) => setFilter({ ...filter, toDate: e.target.value })}
+                className="date-input"
+              />
+            </div>
+            <button 
+              className="reset-btn"
+              onClick={() => setFilter({ status: '', priority: '', category: '', fromDate: '', toDate: '' })}
+            >
+              <RotateCcw size={16} />
+            </button>
           </div>
         </section>
 
@@ -357,19 +397,49 @@ export default function AdminTicketQueue() {
         }
         .filter-group {
           display: flex;
-          align-items: center;
-          gap: 1.5rem;
+          align-items: flex-end;
+          gap: 1.25rem;
+          color: var(--text-muted);
+          flex-wrap: wrap;
+        }
+        .select-wrapper {
+          display: flex;
+          flex-direction: column;
+          gap: 0.5rem;
+        }
+        .select-wrapper label {
+          font-size: 0.7rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
           color: var(--text-muted);
         }
-        select {
-          background: transparent;
-          border: 1px solid var(--border);
-          padding: 0.5rem 1rem;
-          border-radius: 0.5rem;
+        select, .date-input {
+          background: var(--bg-main);
+          border: 1.5px solid var(--border);
+          padding: 0.6rem 1rem;
+          border-radius: 0.75rem;
           font-size: 0.875rem;
+          font-weight: 600;
           outline: none;
           color: var(--text-main);
+          transition: var(--transition);
+          min-width: 140px;
         }
+        select:focus, .date-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+        .reset-btn {
+          background: var(--bg-main);
+          border: 1.5px solid var(--border);
+          padding: 0.6rem;
+          border-radius: 0.75rem;
+          color: var(--text-muted);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: var(--transition);
+          cursor: pointer;
+        }
+        .reset-btn:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-soft); }
 
         .queue-table-wrapper {
           background-color: var(--bg-card);

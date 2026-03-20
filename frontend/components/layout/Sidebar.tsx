@@ -64,92 +64,100 @@ export default function Sidebar() {
         .sidebar {
           width: 280px;
           height: 100vh;
-          background-color: var(--bg-card);
+          background: var(--bg-card);
           border-right: 1px solid var(--border);
           display: flex;
           flex-direction: column;
           position: sticky;
           top: 0;
           box-shadow: var(--shadow-sm);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
         }
         .sidebar-header {
-          padding: 2.5rem 2rem;
+          padding: 3rem 2rem;
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: 0.85rem;
         }
         .logo-section {
           display: flex;
           flex-direction: column;
         }
         .logo-text {
-          font-size: 1.5rem;
+          font-size: 1.6rem;
           font-weight: 900;
           color: var(--text-main);
-          letter-spacing: -0.04em;
+          letter-spacing: -0.05em;
           line-height: 1;
+          background: linear-gradient(135deg, var(--text-main) 0%, var(--primary) 100%);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
         }
         .logo-subtext {
-          font-size: 0.75rem;
+          font-size: 0.65rem;
           font-weight: 800;
           text-transform: uppercase;
-          letter-spacing: 0.15em;
+          letter-spacing: 0.2em;
           color: var(--text-muted);
-          margin-top: 0.25rem;
+          margin-top: 0.35rem;
         }
 
         .menu-list {
           flex: 1;
-          padding: 0 1.25rem;
+          padding: 0 1rem;
           display: flex;
           flex-direction: column;
-          gap: 0.5rem;
+          gap: 0.35rem;
         }
         .menu-item {
           display: flex;
           align-items: center;
           gap: 1rem;
-          padding: 0.85rem 1.25rem;
-          border-radius: 0.75rem;
+          padding: 1rem 1.25rem;
+          border-radius: 1rem;
           color: var(--text-muted);
-          font-weight: 600;
-          font-size: 0.95rem;
+          font-weight: 700;
+          font-size: 0.9rem;
           transition: var(--transition);
+          letter-spacing: -0.01em;
         }
         .menu-item:hover {
-          background-color: var(--bg-main);
-          color: var(--primary);
-          transform: translateX(4px);
-        }
-        .menu-item.active {
           background-color: var(--primary-soft);
           color: var(--primary);
-          box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.1);
+          transform: translateX(6px);
+        }
+        .menu-item.active {
+          background-color: var(--primary);
+          color: white;
+          box-shadow: 0 8px 16px -4px rgba(99, 102, 241, 0.4);
         }
         .menu-item.active :global(svg) {
+          color: white;
           transform: scale(1.1);
-          color: var(--primary);
         }
         .sidebar-footer {
-          padding: 2rem;
-          border-top: 1px solid var(--border);
+          padding: 1.5rem;
+          margin: 1rem;
+          background: var(--bg-main);
+          border-radius: 1.25rem;
+          border: 1px solid var(--border);
         }
         .logout-btn {
           display: flex;
           align-items: center;
           gap: 1rem;
-          padding: 0.85rem 1.25rem;
+          padding: 0.85rem 1rem;
           width: 100%;
-          border-radius: 0.75rem;
+          border-radius: 0.85rem;
           color: #ef4444;
-          font-weight: 700;
-          font-size: 0.95rem;
+          font-weight: 800;
+          font-size: 0.9rem;
           transition: var(--transition);
         }
         .logout-btn:hover {
           background-color: #fef2f2;
-          transform: translateY(-2px);
-          box-shadow: var(--shadow-sm);
+          transform: scale(1.02);
         }
       `}</style>
     </aside>

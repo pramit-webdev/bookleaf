@@ -127,21 +127,28 @@ export default function AuthorDashboard() {
         }
         .stat-card {
           background-color: var(--bg-card);
-          padding: 1.5rem;
+          padding: 2rem;
           border-radius: var(--radius);
-          box-shadow: var(--shadow-sm);
+          box-shadow: var(--shadow-md);
           display: flex;
           align-items: center;
-          gap: 1.25rem;
+          gap: 1.5rem;
           border: 1px solid var(--border);
+          transition: var(--transition);
+        }
+        .stat-card:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--shadow-xl);
+          border-color: var(--primary);
         }
         .icon-wrapper {
-          width: 48px;
-          height: 48px;
-          border-radius: 12px;
+          width: 56px;
+          height: 56px;
+          border-radius: 1rem;
           display: flex;
           align-items: center;
           justify-content: center;
+          box-shadow: var(--shadow-sm);
         }
         .blue { background-color: #eff6ff; color: #3b82f6; }
         .orange { background-color: #fff7ed; color: #f97316; }
@@ -170,20 +177,22 @@ export default function AuthorDashboard() {
         .action-card {
           flex: 1;
           background-color: var(--bg-card);
-          padding: 1.5rem;
+          padding: 2rem;
           border-radius: var(--radius);
           border: 1px solid var(--border);
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 1rem;
-          transition: transform 0.2s, border-color 0.2s;
+          gap: 1.25rem;
+          transition: var(--transition);
           cursor: pointer;
+          box-shadow: var(--shadow-md);
         }
         .action-card:hover {
-          transform: translateY(-4px);
+          transform: translateY(-8px);
           border-color: var(--primary);
           color: var(--primary);
+          box-shadow: var(--shadow-xl);
         }
         .action-card span {
           font-weight: 600;

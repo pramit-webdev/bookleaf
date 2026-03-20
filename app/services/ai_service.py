@@ -88,7 +88,7 @@ def assign_priority(subject: str, description: str) -> dict:
     except:
         return {"priority": "Medium", "score": 50}
 
-def generate_draft_response(subject: str, description: str, ticket_history: list = None) -> str:
+def generate_draft_response(subject: str, description: str, ticket_history: list = None, book_context: dict = None) -> str:
     history_context = ""
     if ticket_history:
         # Keep only last 5 messages for token efficiency (Cost Awareness)
@@ -98,13 +98,19 @@ def generate_draft_response(subject: str, description: str, ticket_history: list
             role = "Staff" if msg.get("sender_role") == "admin" or not msg.get("is_author") else "Author"
             history_context += f"- {role}: {msg['content']}\n"
 
+    book_info = ""
+    if book_context:
+        book_info = "\nRelated Book Context:\n"
+        for key, value in book_context.items():
+            book_info += f"- {key}: {value}\n"
+
     prompt = f"""
     You are an empathetic and professional BookLeaf Author Support representative. 
     Draft a response to the author's query using the Knowledge Base and context provided.
     
     Tone & Content Guidelines:
     1. Acknowledge and empathize with the author's concern first.
-    2. Be specific: use actual numbers, dates, and policies from the Knowledge Base.
+    2. Be specific: use actual numbers, dates, and policies from the Knowledge Base and Book Context.
     3. If something is BookLeaf's fault (delays, errors), own it directly.
     4. Provide clear timelines (e.g., 24-48 hours for sync, 5-7 days for printing).
     5. Always end with a clear next step for the author or BookLeaf.
@@ -115,6 +121,7 @@ def generate_draft_response(subject: str, description: str, ticket_history: list
 
     Ticket Subject: {subject}
     Ticket Description: {description}
+    {book_info}
     {history_context}
     
     Draft the response.
