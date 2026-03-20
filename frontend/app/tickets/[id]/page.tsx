@@ -10,7 +10,7 @@ import Link from 'next/link';
 
 export default function TicketDetail({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const [ticket, setTicket] = useState<any>(null);
   const [responses, setResponses] = useState<any[]>([]);
   const [newResponse, setNewResponse] = useState('');
@@ -73,7 +73,15 @@ export default function TicketDetail({ params }: { params: Promise<{ id: string 
           </Link>
           <div className="header-main">
             <div className="title-section">
-              <h1>{ticket.subject}</h1>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                <h1>{ticket.subject}</h1>
+                {role === 'admin' && (
+                  <Link href={`/admin/tickets/${id}`} className="admin-link-btn">
+                    <Shield size={16} />
+                    <span>View in Admin Portal</span>
+                  </Link>
+                )}
+              </div>
               <div className="meta-row">
                 <span className="id">#{ticket.id.slice(0, 8)}</span>
                 <span className={`status-pill ${ticket.status.toLowerCase().replace(' ', '-')}`}>
@@ -234,6 +242,25 @@ export default function TicketDetail({ params }: { params: Promise<{ id: string 
         .status-pill.in-progress { background-color: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; }
         .status-pill.resolved { background-color: #f0fdf4; color: #15803d; border: 1px solid #dcfce7; }
         .status-pill.closed { background-color: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; }
+        
+        .admin-link-btn {
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+          background-color: var(--primary);
+          color: white;
+          padding: 0.5rem 1rem;
+          border-radius: 0.5rem;
+          font-size: 0.8rem;
+          font-weight: 700;
+          transition: var(--transition);
+          margin-bottom: 1rem;
+        }
+        .admin-link-btn:hover {
+          transform: translateY(-2px);
+          box-shadow: var(--shadow-md);
+          opacity: 0.9;
+        }
 
         .layout-grid {
           display: grid;

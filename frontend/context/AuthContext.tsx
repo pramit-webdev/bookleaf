@@ -22,9 +22,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Check active sessions and sets the user
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
       if (session?.user) {
-        setRole(session.user.user_metadata.role || 'author');
+        setUser(session.user);
+        // Fetch role from authors table
+        try {
+          const { data: authorData } = await supabase
+            .from('authors')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+          
+          setRole(authorData?.role || 'author');
+        } catch (err) {
+          console.error('Error fetching role:', err);
+          setRole('author');
+        }
+      } else {
+        setUser(null);
+        setRole(null);
       }
       setLoading(false);
     };
@@ -32,9 +47,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     getSession();
 
     // Listen for changes on auth state (sign in, sign out, etc.)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setRole(session?.user?.user_metadata.role || 'author');
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      if (session?.user) {
+        setUser(session.user);
+        // Fetch role from authors table
+        try {
+          const { data: authorData } = await supabase
+            .from('authors')
+            .select('role')
+            .eq('id', session.user.id)
+            .single();
+          
+          setRole(authorData?.role || 'author');
+        } catch (err) {
+          console.error('Error fetching role in auth change:', err);
+          setRole('author');
+        }
+      } else {
+        setUser(null);
+        setRole(null);
+      }
       setLoading(false);
     });
 
