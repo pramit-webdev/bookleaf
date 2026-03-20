@@ -11,7 +11,7 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { user, loading } = useAuth();
+  const { user, loading, role } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className={`layout-root theme-${user?.role || 'author'}`}>
+    <div className={`layout-root theme-${role || 'author'}`}>
       <Sidebar />
       <div className="main-content">
         <Navbar />

@@ -96,6 +96,12 @@ button {
 
 button, a, input, select, textarea {
   transition: var(--transition);
+  color: inherit;
+  background-color: transparent;
+}
+input, select, textarea {
+  color: var(--text-main);
+  background-color: var(--bg-main);
 }
 
 button:active {
