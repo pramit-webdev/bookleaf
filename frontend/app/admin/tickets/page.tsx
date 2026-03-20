@@ -25,6 +25,7 @@ export default function AdminTicketQueue() {
     status: '', 
     priority: '', 
     category: '',
+    assignee: '',
     fromDate: '',
     toDate: ''
   });
@@ -36,6 +37,7 @@ export default function AdminTicketQueue() {
         if (filter.status) params.append('status', filter.status);
         if (filter.category) params.append('category', filter.category);
         if (filter.priority) params.append('priority', filter.priority);
+        if (filter.assignee === 'me' && user?.id) params.append('assignee_id', user.id);
         if (filter.fromDate) params.append('from_date', filter.fromDate);
         if (filter.toDate) params.append('to_date', filter.toDate);
         
@@ -57,7 +59,8 @@ export default function AdminTicketQueue() {
       return (
         (filter.status === '' || t.status === filter.status) &&
         (filter.priority === '' || t.priority === filter.priority) &&
-        (filter.category === '' || t.category === filter.category)
+        (filter.category === '' || t.category === filter.category) &&
+        (filter.assignee === '' || (filter.assignee === 'me' && t.assignee_id === user?.id) || (filter.assignee === 'unassigned' && !t.assignee_id))
       );
     })
     .sort((a: any, b: any) => {
@@ -132,6 +135,14 @@ export default function AdminTicketQueue() {
               </select>
             </div>
             <div className="select-wrapper">
+              <label>Assignee</label>
+              <select value={filter.assignee} onChange={(e) => setFilter({ ...filter, assignee: e.target.value })}>
+                <option value="">Any Assignee</option>
+                <option value="me">Assigned to Me</option>
+                <option value="unassigned">Unassigned</option>
+              </select>
+            </div>
+            <div className="select-wrapper">
               <label>From Date</label>
               <input 
                 type="date" 
@@ -151,7 +162,7 @@ export default function AdminTicketQueue() {
             </div>
             <button 
               className="reset-btn"
-              onClick={() => setFilter({ status: '', priority: '', category: '', fromDate: '', toDate: '' })}
+              onClick={() => setFilter({ status: '', priority: '', category: '', assignee: '', fromDate: '', toDate: '' })}
             >
               <RotateCcw size={16} />
             </button>

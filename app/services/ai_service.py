@@ -40,7 +40,7 @@ def classify_ticket(subject: str, description: str) -> str:
     Ticket Subject: {subject}
     Ticket Description: {description}
 
-    Return ONLY the category name.
+    Return JSON format: {{"category": "..."}}
     """
     
     try:
@@ -48,9 +48,11 @@ def classify_ticket(subject: str, description: str) -> str:
             openai_client.chat.completions.create,
             model="gpt-4o-mini",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0
+            temperature=0,
+            response_format={"type": "json_object"}
         )
-        category = response.choices[0].message.content.strip()
+        result = json.loads(response.choices[0].message.content)
+        category = result.get("category")
         return category if category in CATEGORIES else "General Inquiry"
     except:
         return "General Inquiry"
@@ -88,11 +90,11 @@ def assign_priority(subject: str, description: str) -> dict:
     except:
         return {"priority": "Medium", "score": 50}
 
-def generate_draft_response(subject: str, description: str, ticket_history: list = None, book_context: dict = None) -> str:
+def generate_draft_response(subject: str, description: str, ticket_history: list = None, book_context: dict = None) -> tuple[str, bool]:
     history_context = ""
     if ticket_history:
-        # Keep only last 5 messages for token efficiency (Cost Awareness)
-        recent_history = ticket_history[-5:]
+        # Keep only last 3 messages for strict token efficiency
+        recent_history = ticket_history[-3:]
         history_context = "\nRecent Conversation History:\n"
         for msg in recent_history:
             role = "Staff" if msg.get("sender_role") == "admin" or not msg.get("is_author") else "Author"
@@ -105,26 +107,31 @@ def generate_draft_response(subject: str, description: str, ticket_history: list
             book_info += f"- {key}: {value}\n"
 
     prompt = f"""
-    You are an empathetic and professional BookLeaf Author Support representative. 
-    Draft a response to the author's query using the Knowledge Base and context provided.
-    
-    Tone & Content Guidelines:
-    1. Acknowledge and empathize with the author's concern first.
-    2. Be specific: use actual numbers, dates, and policies from the Knowledge Base and Book Context.
-    3. If something is BookLeaf's fault (delays, errors), own it directly.
-    4. Provide clear timelines (e.g., 24-48 hours for sync, 5-7 days for printing).
-    5. Always end with a clear next step for the author or BookLeaf.
-    6. SOUND LIKE A HUMAN PARTNER, NOT A BOT.
+    You are an empathetic, professional support agent at BookLeaf Publishing. 
+    Your job is to draft a response to an author's query.
 
-    Knowledge Base:
+    RULES:
+    1. DO NOT sound like an AI. Do not use words like "Apologies for the inconvenience" or "I understand your frustration" mechanically.
+    2. Use the provided Knowledge Base strictly. If the answer is not in the KB, state that the team will investigate.
+    3. Acknowledge the issue, explain the specific policy/status, and provide a clear timeline/next step.
+    4. If the issue is BookLeaf's fault (e.g., delayed royalties, ISBN errors), apologize directly and own the mistake.
+
+    <KNOWLEDGE_BASE>
     {KNOWLEDGE_BASE}
+    </KNOWLEDGE_BASE>
 
-    Ticket Subject: {subject}
-    Ticket Description: {description}
+    <AUTHOR_BOOK_CONTEXT>
     {book_info}
+    </AUTHOR_BOOK_CONTEXT>
+
+    <TICKET_SUBJECT>: {subject}
+    <TICKET_DESCRIPTION>: {description}
+
+    <RECENT_HISTORY>
     {history_context}
-    
-    Draft the response.
+    </RECENT_HISTORY>
+
+    Draft the direct response to the author below based solely on the context.
     """
     
     try:
@@ -134,6 +141,6 @@ def generate_draft_response(subject: str, description: str, ticket_history: list
             messages=[{"role": "user", "content": prompt}],
             temperature=0.7
         )
-        return response.choices[0].message.content.strip()
-    except:
-        return "I'm sorry, I'm having trouble generating a draft right now. Please respond manually based on the BookLeaf Knowledge Base."
+        return response.choices[0].message.content.strip(), False
+    except Exception as e:
+        return "I'm sorry, I'm having trouble generating a draft right now. Please respond manually based on the BookLeaf Knowledge Base.", True

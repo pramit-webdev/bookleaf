@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from typing import List, Optional
 from app.core.supabase import supabase, supabase_admin
 from app.core.auth import get_current_user, require_admin
@@ -8,32 +8,49 @@ from datetime import datetime
 
 router = APIRouter()
 
+def process_ticket_ai(ticket_id: str, subject: str, description: str):
+    try:
+        category = classify_ticket(subject, description)
+        priority_info = assign_priority(subject, description)
+        supabase.table("tickets").update({
+            "category": category,
+            "priority": priority_info["priority"],
+            "priority_score": priority_info["score"]
+        }).eq("id", ticket_id).execute()
+    except Exception as e:
+        print(f"Background AI Task failed for ticket {ticket_id}: {e}")
+
 @router.post("/", response_model=Ticket)
-async def create_ticket(ticket: TicketCreate, current_user: dict = Depends(get_current_user)):
+async def create_ticket(ticket: TicketCreate, background_tasks: BackgroundTasks, current_user: dict = Depends(get_current_user)):
     try:
         # Security: Auto-assign author_id for non-admins
         if current_user["role"] != "admin":
             ticket.author_id = current_user["author_id"]
         elif not ticket.author_id:
             raise HTTPException(status_code=400, detail="Admin must provide an author_id")
+            
+        # Ensure book_id is explicitly set to None if it's an empty string
+        if ticket.book_id == "":
+            ticket.book_id = None
         
-        # AI Processing
-        category = classify_ticket(ticket.subject, ticket.description)
-        priority_info = assign_priority(ticket.subject, ticket.description)
-        
+        # Initial Insert without waiting for AI
         ticket_data = {
             "author_id": ticket.author_id,
             "book_id": ticket.book_id,
             "subject": ticket.subject,
             "description": ticket.description,
-            "category": category,
-            "priority": priority_info["priority"],
-            "priority_score": priority_info["score"],
+            "category": "Pending",
+            "priority": "Medium",
+            "priority_score": 50,
             "status": "Open"
         }
         
         res = supabase.table("tickets").insert(ticket_data).execute()
         ticket_id = res.data[0]["id"]
+        
+        # Fire and forget AI background tasks
+        background_tasks.add_task(process_ticket_ai, ticket_id, ticket.subject, ticket.description)
+        
         # Fetch with joins
         res = supabase.table("tickets").select("*, book:books!book_id(*), author:authors!author_id(*), responses:ticket_responses(*)").eq("id", ticket_id).execute()
         return res.data[0]
@@ -47,6 +64,7 @@ async def get_tickets(
     status: Optional[str] = None, 
     category: Optional[str] = None, 
     priority: Optional[str] = None,
+    assignee_id: Optional[str] = None,
     from_date: Optional[str] = None,
     to_date: Optional[str] = None,
     current_user: dict = Depends(get_current_user)
@@ -63,6 +81,8 @@ async def get_tickets(
             query = query.eq("category", category)
         if priority:
             query = query.eq("priority", priority)
+        if assignee_id:
+            query = query.eq("assignee_id", assignee_id)
         if from_date:
             query = query.gte("created_at", from_date)
         if to_date:
@@ -191,13 +211,13 @@ async def get_draft(ticket_id: str, current_user: dict = Depends(require_admin))
                     "sender_role": "admin" if r["sender_id"] != ticket["author_id"] else "author"
                 })
         
-        draft = generate_draft_response(
+        draft, ai_failed = generate_draft_response(
             ticket["subject"], 
             ticket["description"], 
             ticket_history=history,
             book_context=book_context
         )
-        return {"draft": draft}
+        return {"draft": draft, "ai_failed": ai_failed}
     except HTTPException:
         raise
     except Exception as e:
