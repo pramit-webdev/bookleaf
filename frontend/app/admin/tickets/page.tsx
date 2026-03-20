@@ -343,15 +343,15 @@ export default function AdminTicketQueue() {
           background-color: var(--primary-soft);
         }
         .ticket-row.urgent { 
-          background-color: #fffaf0; 
+          background-color: rgba(239, 68, 68, 0.05); 
           border-left-color: #ef4444;
         }
         .ticket-row.old { 
-          background-color: #fff1f2; 
+          background-color: rgba(244, 63, 94, 0.08); 
           border-left-color: #f43f5e;
         }
         .ticket-row.urgent.old {
-          background: linear-gradient(to right, #fef2f2, #fffaf0);
+          background: linear-gradient(to right, rgba(244, 63, 94, 0.08), rgba(239, 68, 68, 0.05));
         }
         
         .subject-wrapper { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.25rem; }
