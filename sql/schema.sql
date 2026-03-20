@@ -48,6 +48,7 @@ CREATE TABLE public.tickets (
     priority TEXT, -- AI Assigned
     priority_score INTEGER, -- AI Assigned 0-100
     status TEXT DEFAULT 'Open' CHECK (status IN ('Open', 'In Progress', 'Resolved', 'Closed')),
+    assignee_id UUID REFERENCES public.authors(id),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );

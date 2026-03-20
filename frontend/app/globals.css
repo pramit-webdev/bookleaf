@@ -43,11 +43,11 @@
   }
   
   .theme-admin {
-    --primary: #1e293b;
-    --primary-hover: #334155;
-    --primary-soft: rgba(255, 255, 255, 0.05);
-    --primary-foreground: #f8fafc;
-    --accent: #60a5fa;
+    --primary: #6366f1; /* Use a brighter blue for admin buttons in dark mode too */
+    --primary-hover: #818cf8;
+    --primary-soft: rgba(99, 102, 241, 0.1);
+    --primary-foreground: #ffffff;
+    --accent: #38bdf8;
   }
 }
 

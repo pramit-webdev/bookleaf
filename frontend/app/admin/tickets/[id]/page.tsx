@@ -407,8 +407,11 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
         select.critical { color: #ef4444; border-color: #fecaca; }
         select.high { color: #ea580c; border-color: #fed7aa; }
 
-        .update-btn { width: 100%; padding: 0.85rem; border-radius: 0.5rem; border: 1.5px solid var(--primary); color: var(--primary); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: var(--transition); }
-        .update-btn:hover { background: var(--primary-soft); }
+        .update-btn { width: 100%; padding: 0.85rem; border-radius: 0.5rem; border: 1.5px solid var(--primary); color: var(--primary); font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: var(--transition); background: transparent; }
+        .update-btn:hover { background: var(--primary); color: white; }
+        
+        .assign-btn { font-size: 0.75rem; font-weight: 700; color: var(--primary); background: var(--primary-soft); padding: 0.35rem 0.75rem; border-radius: 6px; border: 1px solid transparent; transition: var(--transition); }
+        .assign-btn:hover { border-color: var(--primary); background: var(--primary); color: white; }
         
         .book-context { margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border); }
         .loading { text-align: center; padding: 4rem; color: var(--text-muted); }
