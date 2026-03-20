@@ -203,14 +203,30 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
                     Internal Note
                   </button>
                 </div>
-                <button 
-                  onClick={fetchAIDraft} 
-                  className="ai-btn" 
-                  disabled={draftLoading || isInternal}
-                >
-                  <Sparkles size={16} />
-                  {draftLoading ? 'Generating...' : 'Get AI Draft'}
-                </button>
+                <div className="ai-assistant-header">
+                  <div className="ai-status">
+                    <Sparkles size={18} className="sparkle-icon" />
+                    <span>AI Assistant</span>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={fetchAIDraft} 
+                    className={`ai-btn ${draftLoading ? 'loading' : 'glowing'}`} 
+                    disabled={draftLoading || isInternal}
+                  >
+                    {draftLoading ? (
+                      <>
+                        <RotateCcw size={14} className="spin" />
+                        <span>Generating Draft...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Edit3 size={14} />
+                        <span>{newResponse ? 'Regenerate Draft' : 'Generate AI Draft'}</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
               
               <form onSubmit={handleSendResponse} className="response-form">
@@ -334,8 +350,27 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
         .msg-header { display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.5rem; color: var(--text-muted); }
         .msg.internal { background: #fffbeb; border-color: #fbbf24; }
 
-        .ai-btn { background: var(--primary-soft); color: var(--primary); padding: 0.5rem 1rem; border-radius: 999px; font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; gap: 0.5rem; }
-        .ai-btn:hover:not(:disabled) { background: #e0e7ff; }
+        .ai-assistant-header { display: flex; align-items: center; justify-content: space-between; width: 100%; border-bottom: 2px solid var(--primary-soft); padding-bottom: 1rem; margin-bottom: 1.5rem; }
+        .ai-status { display: flex; align-items: center; gap: 0.75rem; color: var(--primary); font-weight: 800; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .sparkle-icon { color: var(--primary); animation: sparkle-float 3s ease-in-out infinite; }
+        
+        @keyframes sparkle-float {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-3px) scale(1.1); }
+        }
+
+        .ai-btn { background: var(--primary); color: white; padding: 0.6rem 1.25rem; border-radius: 999px; font-weight: 700; font-size: 0.8rem; display: flex; align-items: center; gap: 0.6rem; transition: var(--transition); border: 2px solid transparent; box-shadow: var(--shadow-md); }
+        .ai-btn.glowing { animation: ai-button-glow 2s infinite; }
+        .ai-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: white; }
+        .ai-btn:disabled { background: var(--bg-main); color: var(--text-muted); box-shadow: none; animation: none; }
+        
+        @keyframes ai-button-glow {
+          0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+          70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        .spin { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
         .tab-group { display: flex; gap: 0.5rem; }
         .tab { padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.875rem; font-weight: 600; color: var(--text-muted); }
