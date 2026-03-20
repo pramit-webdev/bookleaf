@@ -54,7 +54,10 @@ export default function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <button onClick={() => signOut()} className="logout-btn">
+        <button onClick={async () => {
+          await signOut();
+          window.location.href = '/login';
+        }} className="logout-btn">
           <LogOut size={20} />
           <span>Sign Out</span>
         </button>

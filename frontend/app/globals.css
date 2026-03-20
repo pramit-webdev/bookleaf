@@ -43,9 +43,10 @@
   }
   
   .theme-admin {
-    --primary: #f8fafc;
-    --primary-hover: #f1f5f9;
+    --primary: #1e293b;
+    --primary-hover: #334155;
     --primary-soft: rgba(255, 255, 255, 0.05);
+    --primary-foreground: #f8fafc;
     --accent: #60a5fa;
   }
 }
@@ -97,11 +98,19 @@ button {
 button, a, input, select, textarea {
   transition: var(--transition);
   color: inherit;
-  background-color: transparent;
 }
 input, select, textarea {
   color: var(--text-main);
   background-color: var(--bg-main);
+}
+button {
+  color: var(--text-main);
+}
+.theme-author button {
+  color: #ffffff;
+}
+.theme-admin button {
+  color: var(--text-main);
 }
 
 button:active {
