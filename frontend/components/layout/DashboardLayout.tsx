@@ -36,7 +36,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="layout-root">
+    <div className={`layout-root theme-${user?.role || 'author'}`}>
       <Sidebar />
       <div className="main-content">
         <Navbar />

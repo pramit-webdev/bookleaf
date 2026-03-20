@@ -16,6 +16,21 @@
   --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.theme-admin {
+  --primary: #0f172a;
+  --primary-hover: #1e293b;
+  --primary-soft: #f1f5f9;
+  --accent: #3b82f6;
+  --bg-main: #f8fafc;
+}
+
+.theme-author {
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-soft: #eef2ff;
+}
+
+
 @media (prefers-color-scheme: dark) {
   :root {
     --bg-main: #020617;

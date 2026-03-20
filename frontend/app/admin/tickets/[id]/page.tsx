@@ -78,6 +78,13 @@ export default function AdminTicketDetail({ params }: { params: Promise<{ id: st
     return () => clearInterval(interval);
   }, [id]);
 
+  // Auto-generate AI draft on first open if response is empty
+  useEffect(() => {
+    if (ticket && !newResponse && !responses.some(r => !r.is_internal) && ticket.status === 'Open') {
+      fetchAIDraft();
+    }
+  }, [ticket?.id]);
+
   const handleUpdateTicket = async () => {
     setUpdating(true);
     try {

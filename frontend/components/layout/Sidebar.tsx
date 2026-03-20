@@ -34,7 +34,10 @@ export default function Sidebar() {
     <aside className="sidebar">
       <div className="sidebar-header">
         <BookOpen size={32} color="var(--primary)" />
-        <span className="logo-text">BookLeaf</span>
+        <div className="logo-section">
+          <span className="logo-text">BookLeaf</span>
+          {role === 'admin' && <span className="logo-subtext">Operations</span>}
+        </div>
       </div>
 
       <nav className="menu-list">
@@ -75,15 +78,26 @@ export default function Sidebar() {
           align-items: center;
           gap: 1rem;
         }
+        .logo-section {
+          display: flex;
+          flex-direction: column;
+        }
         .logo-text {
           font-size: 1.5rem;
           font-weight: 900;
           color: var(--text-main);
           letter-spacing: -0.04em;
-          background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
+          line-height: 1;
         }
+        .logo-subtext {
+          font-size: 0.75rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          color: var(--text-muted);
+          margin-top: 0.25rem;
+        }
+
         .menu-list {
           flex: 1;
           padding: 0 1.25rem;
