@@ -43,7 +43,12 @@ async def create_ticket(ticket: TicketCreate, current_user: dict = Depends(get_c
         raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/", response_model=List[Ticket])
-async def get_tickets(status: Optional[str] = None, category: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+async def get_tickets(
+    status: Optional[str] = None, 
+    category: Optional[str] = None, 
+    priority: Optional[str] = None,
+    current_user: dict = Depends(get_current_user)
+):
     try:
         query = supabase.table("tickets").select("*, book:books!book_id(*), author:authors!author_id(*), responses:ticket_responses(*)")
         
@@ -54,8 +59,17 @@ async def get_tickets(status: Optional[str] = None, category: Optional[str] = No
             query = query.eq("status", status)
         if category:
             query = query.eq("category", category)
+        if priority:
+            query = query.eq("priority", priority)
             
-        res = query.order("created_at", desc=True).execute()
+        # Admin sorting: most urgent first, then oldest unresolved first
+        if current_user["role"] == "admin":
+            # Note: Complex multi-column sorting might be limited in thin-client Supabase
+            # Simple approach: primary sort by created_at (oldest first)
+            res = query.order("created_at", desc=False).execute()
+        else:
+            res = query.order("created_at", desc=True).execute()
+            
         tickets = res.data
         
         # Filter internal responses for non-admins
@@ -139,12 +153,23 @@ async def add_response(ticket_id: str, response_in: TicketResponseCreate, curren
 @router.get("/{ticket_id}/draft")
 async def get_draft(ticket_id: str, current_user: dict = Depends(require_admin)):
     try:
-        ticket_res = supabase.table("tickets").select("*").eq("id", ticket_id).execute()
-        if not ticket_res.data:
+        # Fetch ticket with responses for context
+        res = supabase.table("tickets").select("*, responses:ticket_responses(*)").eq("id", ticket_id).execute()
+        if not res.data:
             raise HTTPException(status_code=404, detail="Ticket not found")
             
-        ticket = ticket_res.data[0]
-        draft = generate_draft_response(ticket["subject"], ticket["description"])
+        ticket = res.data[0]
+        # Format history for the AI service
+        history = []
+        if "responses" in ticket:
+            for r in ticket["responses"]:
+                history.append({
+                    "content": r["content"],
+                    "is_author": r["sender_id"] == ticket["author_id"],
+                    "sender_role": "admin" if r["sender_id"] != ticket["author_id"] else "author"
+                })
+        
+        draft = generate_draft_response(ticket["subject"], ticket["description"], ticket_history=history)
         return {"draft": draft}
     except HTTPException:
         raise

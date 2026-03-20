@@ -76,11 +76,20 @@ Once running, visit:
 ### 1. Database & Security (Supabase RLS)
 We use Row Level Security (RLS) to ensure data isolation. Authors can only view their own books and tickets, while Admins have full access. This is enforced at the database level for maximum security.
 
-### 2. AI Service (Prompt Engineering)
-The AI service is decoupled from the routes. It uses structured prompts and the BookLeaf Knowledge Base (stored in `app/core/knowledge_base.txt`) to ensure consistent, policy-compliant responses. We use `gpt-4o-mini` for its balance of cost and performance.
+### 2. AI Service & Integration Strategy
+The AI service is decoupled from the routes for cleaner maintenance. We use `gpt-4o-mini` for the following reasons:
+- **Cost Awareness**: It offers a 10x lower price point compared to GPT-4o while maintaining high accuracy for classification and drafting.
+- **Performance**: It provides near-instant responses (low latency), essential for a responsive admin interface.
+- **Context Injection**: We use a custom Knowledge Base and recent ticket history (last 5 messages) to provide precise, policy-aligned drafts.
+
+**Integration Strategy**:
+- **Prompt Engineering**: System instructions are designed to match BookLeaf's empathetic and professional tone.
+- **Cost Efficiency**: We limit context window to relevant history and the core knowledge base.
+- **Graceful Degradation**: If the AI API is down, tickets are assigned default values ("General Inquiry", "Medium" priority), and admins are notified to respond manually.
+- **Error Resilience**: Automatic retries (with exponential backoff) are implemented for all LLM calls.
 
 ### 3. Graceful Degradation
-If the OpenAI API is unavailable, the ticket is still created with "General Inquiry" and "Medium" priority by default, allowing the admin team to process it manually without downtime.
+As noted above, if the OpenAI API is unavailable, the ticket is still created with "General Inquiry" and "Medium" priority by default, allowing the admin team to process it manually without downtime.
 
 ### 4. Role-Based Access Control (RBAC)
 We differentiate between `author` and `admin` roles. Admins have access to internal notes and can see the entire ticket queue across all authors.

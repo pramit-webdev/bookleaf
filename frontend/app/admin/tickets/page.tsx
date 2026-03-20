@@ -26,7 +26,12 @@ export default function AdminTicketQueue() {
   useEffect(() => {
     const loadTickets = async () => {
       try {
-        const data = await fetchWithAuth('/tickets/');
+        const params = new URLSearchParams();
+        if (filter.status) params.append('status', filter.status);
+        if (filter.category) params.append('category', filter.category);
+        if (filter.priority) params.append('priority', filter.priority);
+        
+        const data = await fetchWithAuth(`/tickets/?${params.toString()}`);
         setTickets(data);
       } catch (err) {
         console.error('Failed to load tickets', err);
@@ -35,7 +40,7 @@ export default function AdminTicketQueue() {
       }
     };
     loadTickets();
-  }, []);
+  }, [filter]); // Re-fetch when filter changes
 
   const priorityOrder: { [key: string]: number } = { 'Critical': 0, 'High': 1, 'Medium': 2, 'Low': 3 };
 
