@@ -15,24 +15,49 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    console.log('Attempting login for:', email);
 
-    const { error, data } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const { error, data } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    if (error) {
-      toast.error(error.message);
-      setLoading(false);
-    } else {
+      if (error) {
+        console.error('Login error:', error.message);
+        toast.error(error.message);
+        setLoading(false);
+        return;
+      }
+
+      console.log('Login successful, checking role...');
       toast.success('Logged in successfully!');
-      const role = data.user?.user_metadata.role;
+      
+      // First check metadata, then fallback to database query if needed
+      // LoginPage happens before AuthContext has time to fully refresh for the new session sometimes
+      let role = data.user?.user_metadata.role;
+      
+      if (!role) {
+        const { data: authorData } = await supabase
+          .from('authors')
+          .select('role')
+          .eq('id', data.user.id)
+          .single();
+        role = authorData?.role;
+      }
+
+      console.log('Redirecting based on role:', role);
       if (role === 'admin') {
         router.push('/admin/tickets');
       } else {
         router.push('/dashboard');
       }
+    } catch (err: any) {
+      console.error('Unexpected login crash:', err);
+      toast.error('An unexpected error occurred during login.');
+      setLoading(false);
     }
+    // Note: We don't setLoading(false) here on success because router.push will transition the page
   };
 
   return (
