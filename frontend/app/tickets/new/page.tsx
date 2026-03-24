@@ -36,21 +36,38 @@ export default function NewTicket() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    console.log('Submitting ticket with data:', formData);
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
 
     try {
-      await fetchWithAuth('/tickets/', {
+      const payload = {
+        ...formData,
+        book_id: formData.book_id || null,
+      };
+      
+      console.log('Sending POST request to /tickets/...');
+      const result = await fetchWithAuth('/tickets/', {
         method: 'POST',
-        body: JSON.stringify({
-          ...formData,
-          book_id: formData.book_id || null,
-        }),
-      });
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      } as any);
+      
+      console.log('Submission successful:', result);
+      clearTimeout(timeoutId);
       toast.success('Ticket submitted successfully! AI is analyzing your request.');
       router.push('/tickets');
     } catch (err: any) {
-      toast.error(err.message || 'Failed to submit ticket');
-    } finally {
+      console.error('Submission failed:', err);
+      if (err.name === 'AbortError') {
+        toast.error('Submission timed out. The backend might be starting up. Please try again.');
+      } else {
+        toast.error(err.message || 'Failed to submit ticket');
+      }
       setSubmitting(false);
+    } finally {
+      clearTimeout(timeoutId);
     }
   };
 
