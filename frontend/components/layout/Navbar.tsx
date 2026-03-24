@@ -1,10 +1,10 @@
 'use client';
 
 import { useAuth } from '@/context/AuthContext';
-import { User, Bell, Search } from 'lucide-react';
+import { User, Bell, Search, LogOut } from 'lucide-react';
 
 export default function Navbar() {
-  const { user, role } = useAuth();
+  const { user, role, signOut } = useAuth();
 
   return (
     <header className="navbar">
@@ -25,6 +25,16 @@ export default function Navbar() {
           <div className="avatar">
             <User size={20} color="var(--text-muted)" />
           </div>
+          <button 
+            className="icon-btn logout-nav-btn" 
+            title="Sign Out"
+            onClick={async () => {
+              await signOut();
+              window.location.replace('/login');
+            }}
+          >
+            <LogOut size={18} color="#ef4444" />
+          </button>
         </div>
       </div>
 

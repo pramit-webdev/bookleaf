@@ -54,10 +54,23 @@ export default function Sidebar() {
       </nav>
 
       <div className="sidebar-footer">
-        <button onClick={async () => {
-          await signOut();
-          window.location.href = '/login';
-        }} className="logout-btn">
+        <button 
+          onClick={async () => {
+            console.log('Sign out initiated...');
+            try {
+              await signOut();
+              console.log('Sign out successful, redirecting...');
+              // Use window.location.replace for a cleaner redirect that clears history
+              window.location.replace('/login');
+            } catch (err) {
+              console.error('Sign out failed:', err);
+              // Fallback redirect even if signOut fails
+              window.location.replace('/login');
+            }
+          }} 
+          className="logout-btn"
+          style={{ cursor: 'pointer' }}
+        >
           <LogOut size={20} />
           <span>Sign Out</span>
         </button>
