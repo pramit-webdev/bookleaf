@@ -2,12 +2,12 @@
 
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useAuth } from '@/context/AuthContext';
-import { Book, Ticket, Clock, CheckCircle } from 'lucide-react';
+import { Book, Ticket, Clock, CheckCircle, User, Shield, AlertCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { fetchWithAuth } from '@/lib/api';
 
 export default function AuthorDashboard() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
   const [stats, setStats] = useState({
     totalBooks: 0,
     openTickets: 0,
@@ -46,62 +46,123 @@ export default function AuthorDashboard() {
       <div className="dashboard">
         <header className="welcome">
           <h1>Welcome back, {user?.email?.split('@')[0]}!</h1>
-          <p>Here's what's happening with your books and support requests.</p>
+          <p>{role === 'admin' ? "Managing operations and supporting our authors." : "Here's what's happening with your books and support requests."}</p>
         </header>
 
         <div className="stats-grid">
-          <div className="stat-card">
-            <div className="icon-wrapper blue">
-              <Book size={24} />
-            </div>
-            <div className="stat-content">
-              <h3>Total Books</h3>
-              <p className="value">{loading ? '...' : stats.totalBooks}</p>
-            </div>
-          </div>
+          {role === 'admin' ? (
+            <>
+              <div className="stat-card">
+                <div className="icon-wrapper blue">
+                  <User size={24} />
+                </div>
+                <div className="stat-content">
+                  <h3>Active Authors</h3>
+                  <p className="value">{loading ? '...' : '24'}</p>
+                </div>
+              </div>
 
-          <div className="stat-card">
-            <div className="icon-wrapper orange">
-              <Clock size={24} />
-            </div>
-            <div className="stat-content">
-              <h3>Open Tickets</h3>
-              <p className="value">{loading ? '...' : stats.openTickets}</p>
-            </div>
-          </div>
+              <div className="stat-card">
+                <div className="icon-wrapper orange">
+                  <Clock size={24} />
+                </div>
+                <div className="stat-content">
+                  <h3>Unassigned Tickets</h3>
+                  <p className="value">{loading ? '...' : stats.openTickets}</p>
+                </div>
+              </div>
 
-          <div className="stat-card">
-            <div className="icon-wrapper green">
-              <CheckCircle size={24} />
-            </div>
-            <div className="stat-content">
-              <h3>Resolved</h3>
-              <p className="value">{loading ? '...' : stats.resolvedTickets}</p>
-            </div>
-          </div>
+              <div className="stat-card">
+                <div className="icon-wrapper green">
+                  <CheckCircle size={24} />
+                </div>
+                <div className="stat-content">
+                  <h3>SLA Adherence</h3>
+                  <p className="value">{loading ? '...' : '98%'}</p>
+                </div>
+              </div>
 
-          <div className="stat-card">
-            <div className="icon-wrapper purple">
-              <Ticket size={24} />
-            </div>
-            <div className="stat-content">
-              <h3>Total Royalty</h3>
-              <p className="value">₹{loading ? '...' : stats.totalRoyalty.toLocaleString()}</p>
-            </div>
-          </div>
+              <div className="stat-card">
+                <div className="icon-wrapper purple">
+                  <AlertCircle size={24} />
+                </div>
+                <div className="stat-content">
+                  <h3>Urgent Queries</h3>
+                  <p className="value">{loading ? '...' : 5}</p>
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="stat-card">
+                <div className="icon-wrapper blue">
+                  <Book size={24} />
+                </div>
+                <div className="stat-content">
+                  <h3>Total Books</h3>
+                  <p className="value">{loading ? '...' : stats.totalBooks}</p>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="icon-wrapper orange">
+                  <Clock size={24} />
+                </div>
+                <div className="stat-content">
+                  <h3>Open Tickets</h3>
+                  <p className="value">{loading ? '...' : stats.openTickets}</p>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="icon-wrapper green">
+                  <CheckCircle size={24} />
+                </div>
+                <div className="stat-content">
+                  <h3>Resolved</h3>
+                  <p className="value">{loading ? '...' : stats.resolvedTickets}</p>
+                </div>
+              </div>
+
+              <div className="stat-card">
+                <div className="icon-wrapper purple">
+                  <Ticket size={24} />
+                </div>
+                <div className="stat-content">
+                  <h3>Total Royalty</h3>
+                  <p className="value">₹{loading ? '...' : stats.totalRoyalty.toLocaleString()}</p>
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
         <section className="quick-actions">
           <h2>Quick Actions</h2>
           <div className="actions-grid">
-            <a href="/tickets/new" className="action-card">
-              <Ticket size={24} />
-              <span>Raise a Query</span>
-            </a>
-            <a href="/books" className="action-card">
-              <Book size={24} />
-              <span>View Royalties</span>
-            </a>
+            {role === 'admin' ? (
+              <>
+                <a href="/admin/tickets" className="action-card">
+                  <Shield size={24} />
+                  <span>Manage Ticket Queue</span>
+                </a>
+                <a href="/admin/users" className="action-card">
+                  <User size={24} />
+                  <span>Review Authors</span>
+                </a>
+              </>
+            ) : (
+              <>
+                <a href="/tickets/new" className="action-card">
+                  <Ticket size={24} />
+                  <span>Raise a Query</span>
+                </a>
+                <a href="/books" className="action-card">
+                  <Book size={24} />
+                  <span>View Royalties</span>
+                </a>
+              </>
+            )}
           </div>
         </section>
       </div>
